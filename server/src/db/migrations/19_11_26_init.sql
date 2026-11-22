@@ -5,7 +5,6 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm"; -- fast ilike search
 CREATE TYPE user_role AS ENUM ('admin', 'staff');
 CREATE TYPE appointment_status AS ENUM ('pending', 'confirmed', 'cancelled');
 
-
 CREATE TABLE users(
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     full_name varchar(50) NOT NULL,
