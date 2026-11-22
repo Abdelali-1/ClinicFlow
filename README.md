@@ -9,3 +9,6 @@
 
 # 1. database
 psql -U postgres -c "CREATE DATABASE clinicflow;"
+
+-npm run migrate
+-npm run seed

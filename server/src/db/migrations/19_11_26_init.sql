@@ -9,7 +9,7 @@ CREATE TYPE appointment_status AS ENUM ('pending', 'confirmed', 'cancelled');
 CREATE TABLE users(
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     full_name varchar(50) NOT NULL,
-    email varchar(50) UNIQUE NOT NULL,
+    email varchar(254) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     role user_role NOT NULL DEFAULT 'staff',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -28,10 +28,10 @@ CREATE TABLE patients(
 
 CREATE TABLE appointments(
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    patient_id uuid REFERENCES patients(id) ON DELETE CASCADE,
+    patient_id uuid REFERENCES patients(id) ON DELETE CASCADE NOT NULL,
     appointment_date TIMESTAMPTZ NOT NULL,
     status appointment_status NOT NULL DEFAULT 'pending',
-    reson VARCHAR(255) NOT NULL,
+    reason VARCHAR(255) NOT NULL,
     notes TEXT,
     created_by uuid REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -51,10 +51,16 @@ CREATE TABLE audit_logs (
 --search index 
 CREATE INDEX idx_patients_full_name_trgm ON patients USING gin (full_name gin_trgm_ops);
 CREATE INDEX idx_patients_cin_trgm ON patients USING gin (cin gin_trgm_ops);
-CREATE INDEX idx_patients_created_at ON patients USING gin (created_at DESC);
+CREATE INDEX idx_patients_created_at ON patients (created_at DESC);
+CREATE INDEX idx_patients_active ON patients (created_at DESC) WHERE deleted_at IS NULL;
 
 --search index for appointments
 CREATE INDEX idx_appt_patient_date ON appointments (patient_id, appointment_date);
 CREATE INDEX idx_appt_date ON appointments (appointment_date);
 CREATE INDEX idx_appt_status ON appointments (status);
 CREATE INDEX idx_appt_confirmed ON appointments (patient_id, appointment_date) WHERE status = 'confirmed';
+
+--search index  for audit_logs
+CREATE INDEX idx_audit_user ON audit_logs (user_id);
+CREATE INDEX idx_audit_entity ON audit_logs (entity, entity_id);
+CREATE INDEX idx_audit_created_at ON audit_logs (created_at DESC);
