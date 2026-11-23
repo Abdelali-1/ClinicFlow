@@ -1,5 +1,5 @@
-import { query } from "../config/db";
-import { AppError } from "../utils/AppErrors";
+import { query } from "../config/db.js";
+import { AppError } from "../utils/AppErrors.js";
 
 const COLS = `id, full_name AS "fullName", cin, phone, birth_date AS "birthDate",
               address, created_at AS "createdAt"`;

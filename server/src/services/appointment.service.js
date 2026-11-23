@@ -1,5 +1,5 @@
-import { query, withTransaction } from "../config/db";
-import { AppError } from "../utils/AppErrors";
+import { query, withTransaction } from "../config/db.js";
+import { AppError } from "../utils/AppErrors.js";
 
 const SELECT = `
   SELECT a.id, a.patient_id AS "patientId", p.full_name AS "patientName",
