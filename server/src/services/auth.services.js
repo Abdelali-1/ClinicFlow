@@ -22,7 +22,7 @@ export async function login(email, password){
     return {token, user: publicUser(user)};
 }
 
-export async function GetUser(id){
+export async function GetMe(id){
     const {rows} = await query(
         `SELECT id, full_name, email, password_hash, role 
             FROM users 
