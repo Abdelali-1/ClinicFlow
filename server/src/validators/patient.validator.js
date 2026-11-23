@@ -3,20 +3,20 @@ import {z} from 'zod';
 export const idParam = z.object({id: z.string().uuid("Invalid UUID format")});
 
 export const  patientSchema = z.object({
-    full_name : z.string("Full name is required")
+    full_name : z.string()
                 .min(1, "Full name cannot be empty")
                 .max(120, "Full name cannot exceed 100 characters"),
 
-    cin : z.string("CIN is required")
+    cin : z.string()
             .min(1, "CIN cannot be empty")
             .max(20, "CIN cannot exceed 20 characters")
             .transform((val) => val.toUpperCase()),
 
-    phone: z.string("Phone number is required")
+    phone: z.string()
             .min(1, "Phone number cannot be empty")
             .max(20, "Phone number cannot exceed 20 characters"),
 
-    birth_date: z.string("Birth date is required")
+    birth_date: z.string()
                 .regex(/^\d{4}-\d{2}-\d{2}$/, "Birth date must be in YYYY-MM-DD format")
                 .refine((val)=> new Date(val) <= new Date(), "Birth date cannot be in the future"),
 

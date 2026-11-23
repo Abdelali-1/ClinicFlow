@@ -3,11 +3,11 @@ import {z} from 'zod';
 export const STATUSES = ['pending', 'confirmed', 'cancelled'];
 
 export const appointmentSchema = z.object({
-    patient_id: z.string("Patient ID is required")
+    patient_id: z.string()
                 .uuid("Invalid UUID format"),
     appointment_date: z.coerce.date("Appointment date is required"),
     status: z.enum(STATUSES, "Invalid status value").default('pending'),
-    reason: z.string("Reason is required")
+    reason: z.string()
             .trim()
             .max(255, "Reason cannot exceed 255 characters")
             .min(3, "Reason cannot be empty"),

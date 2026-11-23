@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { query } from '../config/db';
-import { env } from '../config/env';
-import { AppError } from '../utils/AppErrors';
+import { query } from '../config/db.js';
+import { env } from '../config/env.js';
+import { AppError } from '../utils/AppErrors.js';
 
 const publicUser = (u) => ({id: u.id, fullName: u.full_name, email : u.email, role: u.role});
 
