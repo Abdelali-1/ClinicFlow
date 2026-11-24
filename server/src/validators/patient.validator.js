@@ -3,7 +3,7 @@ import {z} from 'zod';
 export const idParam = z.object({id: z.string().uuid("Invalid UUID format")});
 
 export const  patientSchema = z.object({
-    full_name : z.string()
+    fullName : z.string()
                 .min(1, "Full name cannot be empty")
                 .max(120, "Full name cannot exceed 100 characters"),
 
@@ -16,7 +16,7 @@ export const  patientSchema = z.object({
             .min(1, "Phone number cannot be empty")
             .max(20, "Phone number cannot exceed 20 characters"),
 
-    birth_date: z.string()
+    birthDate: z.string()
                 .regex(/^\d{4}-\d{2}-\d{2}$/, "Birth date must be in YYYY-MM-DD format")
                 .refine((val)=> new Date(val) <= new Date(), "Birth date cannot be in the future"),
 

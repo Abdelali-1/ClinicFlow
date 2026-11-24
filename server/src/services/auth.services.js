@@ -9,12 +9,14 @@ const publicUser = (u) => ({id: u.id, fullName: u.full_name, email : u.email, ro
 export async function login(email, password){
      const { rows } = await query(
         `SELECT id, full_name, email, password_hash, role
-         FROM users
-         WHERE email = $1`,
-        [email]
+            FROM users
+            WHERE LOWER(email) = LOWER($1)`,
+        [email.trim()]
     );
 
     const user = rows[0];
+    console.log('User found:', !!user);
+    console.log('Hash exists:', !!user?.password_hash);
     const result = user && (await bcrypt.compare(password, user.password_hash));
     if(!result) throw new AppError(401,'Invalid user or password');
 
@@ -24,7 +26,7 @@ export async function login(email, password){
 
 export async function GetMe(id){
     const {rows} = await query(
-        `SELECT id, full_name, email, password_hash, role 
+        `SELECT id, full_name, email, role 
             FROM users 
             WHERE id = $1 `,
         [id]);

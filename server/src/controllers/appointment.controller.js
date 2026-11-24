@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import * as srv from "../services/appointment.service.js"
 
 export const create = asyncHandler(async (req, res) => {
-  res.status(201).json({ appointment: await svc.create(req.validated.body, req.user.id) });
+  res.status(201).json({ appointment: await srv.create(req.validated.body, req.user.id) });
 });
 
 export const list = asyncHandler(async (req, res) => {

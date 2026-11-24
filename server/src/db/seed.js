@@ -14,9 +14,9 @@ const run = async() =>{
         await client.query('BEGIN');
         await client.query('TRUNCATE appointments, patients, users CASCADE');
 
-        const passwordHash = await bcrypt.hash('Aliouka123123@#', 10);
+        const passwordHash = await bcrypt.hash('Aliouka123', 10);
         const users = [
-            ['Admin Clinic', 'admin@clinicFlow.com', 'admin'],
+            ['Admin Clinic', 'admin@clinicflow.com', 'admin'],
             ['Ali staff', 'ali.staff@clinicFlow.com', 'staff'],
             ['Omar Staff', 'omar.staff@clinicFlow.com', 'staff']
         ];

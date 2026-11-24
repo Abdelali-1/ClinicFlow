@@ -10,7 +10,7 @@ r.use(authenticate);
 r.post('/', validate(patientSchema), ctrl.create);
 r.get('/', validate(listPatientsQuery, 'query'), ctrl.list);
 r.get('/:id', validate(idParam, 'params'), ctrl.getOne);
-r.put('/:id', validate(idParam, 'parms'), validate(patientSchema), ctrl.update);
+r.put('/:id', validate(idParam, 'params'), validate(patientSchema), ctrl.update);
 r.delete('/:id', RequiredRole('admin'), validate(idParam, 'params'), ctrl.remove);
 
 export default r;

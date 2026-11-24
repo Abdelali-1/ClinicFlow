@@ -6,8 +6,8 @@ const COLS = `id, full_name AS "fullName", cin, phone, birth_date AS "birthDate"
 
 export async function create(d){
     const {rows} = await query(`
-        INSERT INTO patients(full_name,cin,phone,birth_date,address) 
-        VALUES($1,$2,$3,$4,$5) 
+        INSERT INTO patients (full_name, cin, phone, birth_date, address)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING ${COLS}`,
         [d.fullName, d.cin, d.phone, d.birthDate, d.address ?? null]);
 
@@ -16,17 +16,20 @@ export async function create(d){
 
 export async function getById(id){
     const {rows} = await query(`
-        SELECT ${COLS} FROM patients WHERE id = $1`,[id]);
+        SELECT ${COLS} FROM patients 
+        WHERE id = $1
+        AND deleted_at IS NULL`
+        ,[id]);
     if(!rows[0]) throw new AppError(404, 'Patient not found');
     return rows[0];
 }
 
 export async function list({search, page, limit}){
     const params = [];
-    let  where = '';
+    let where = 'WHERE deleted_at IS NULL';
     if(search){
         params.push(`%${search.replace(/[%_\\]/g, '\\$&')}%`);
-        where = 'WHERE (full_name ILIKE $1 OR cin ILIKE $1)'
+        where += ` AND (full_name ILIKE $1 OR cin ILIKE $1)`;
     }
     const offset = (page - 1) * limit;
     const [items, count] = await Promise.all([
@@ -45,14 +48,21 @@ export async function list({search, page, limit}){
 export async function update(id, d){
     const {rows} = await query(`
         UPDATE patients 
-        SET full_name=$1, cin=$2, phone=$3, birth_date=$4,address=$5
-        WHERE id=$6 RETURNING ${COLS}`, [d.fullName, d.cin, d.phone, d.birthDate,d.address ?? null, id])
+            SET full_name=$1, cin=$2, phone=$3, birth_date=$4,address=$5
+            WHERE id=$6 AND deleted_at IS NULL
+            RETURNING ${COLS}`,
+        [d.fullName, d.cin, d.phone, d.birthDate,d.address ?? null, id])
 
     if(!rows[0]) throw new AppError(404,'Patient not found');
     return rows[0];
 }
 
 export async function remove(id){
-    const {row} = query(`DELETE FROM patients WHERE id=$1`,[id])
-    if(!row[0]) throw new AppError(404,'Patient not found');
+    const {rows} = await query(`
+        UPDATE patients 
+            SET deleted_at = NOW()
+            WHERE id = $1
+            RETURNING id`,
+        [id])
+    if(!rows[0]) throw new AppError(404,'Patient not found');
 }

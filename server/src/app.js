@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import swaggerUi from 'swagger-ui-express';
+import openapi from './docs/openapi.js';
 import { env } from './config/env.js';
 import authRoutes from './routes/auth.route.js';
 import patientRoute from './routes/patient.route.js';
@@ -23,6 +25,7 @@ app.use(morgan('dev'));
 
 app.get('/api/health',(req,res) => res.json({status : "ok"}));
 app.use('/api/auth', authRoutes);
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openapi));
 app.use('/api/patients', patientRoute);
 app.use('/api/appointments', appointmentRoute);
 app.use('/api/dashboard', dashbaordRoutes);

@@ -13,6 +13,6 @@ const r = Router();
 r.use(authenticate);
 r.post('/', validate(appointmentSchema), ctrl.create);
 r.get('/', validate(listAppointmentQuery, 'query'), ctrl.list)
-r.patch('/:id', validate(idParam, 'params'), validate(appointmentSchema), ctrl.updateStatus);
+r.patch('/:id/status', validate(idParam, 'params'), validate(updateStatusSchema), ctrl.updateStatus);
 
 export default r;

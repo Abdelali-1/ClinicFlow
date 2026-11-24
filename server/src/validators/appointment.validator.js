@@ -3,9 +3,9 @@ import {z} from 'zod';
 export const STATUSES = ['pending', 'confirmed', 'cancelled'];
 
 export const appointmentSchema = z.object({
-    patient_id: z.string()
+    patientId: z.string()
                 .uuid("Invalid UUID format"),
-    appointment_date: z.coerce.date("Appointment date is required"),
+    appointmentDate: z.coerce.date("Appointment date is required"),
     status: z.enum(STATUSES, "Invalid status value").default('pending'),
     reason: z.string()
             .trim()

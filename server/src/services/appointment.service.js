@@ -9,7 +9,7 @@ const SELECT = `
 
 
 export async function getById(id){
-    const {rows} = await query(`${SELECT} WHERE id = $1`, [id]);
+    const {rows} = await query(`${SELECT} WHERE a.id = $1`, [id]);
     if(!rows[0]) throw new AppError(404, 'Appointment not found');
     return rows[0];
 } 
@@ -21,14 +21,19 @@ export async function create(d, userId){
         await lockPatient(client, d.patientId);
         if(d.status === 'confirmed') await assertNoConflit(client, d.patientId, date);
         
-        const {rows} = await query(`
+        const {rows} = await client.query(`
             INSERT INTO appointments(patient_id, appointment_date, status, reason, notes, created_by)
-                VALUES($1,$2,$3,$4,$5,$6)`,
+                VALUES($1,$2,$3,$4,$5,$6) 
+                RETURNING id`,
             [d.patientId, date, d.status, d.reason, d.notes ?? null, userId]
             );
+        
+        if (!rows[0]) {
+            throw new AppError(500, 'Appointment creation failed');
+        }
         return rows[0].id;
     });
-    await getById(result);
+    return await getById(result);
 }
 
 export async function list({date, status, patientId}) {
@@ -58,16 +63,16 @@ export async function list({date, status, patientId}) {
 export async function updateStatus(id, status){
     await withTransaction(async (client) => {
         const {rows} = await client.query(`
-            SELECT patientId, appointment_date FROM appointments
+            SELECT patient_id, appointment_date FROM appointments
                 WHERE id = $1`,
             [id]
         );
         
         if(!rows[0]) throw new AppError(404,'Appointment not found');
-        const {patient_Id, appointment_date} = rows[0];
+        const {patient_id, appointment_date} = rows[0];
         
-        await lockPatient(client,patient_Id);
-        if(status === 'confirmed') await assertNoConflit(client, patient_Id, appointment_date);
+        await lockPatient(client,patient_id);
+        if(status === 'confirmed') await assertNoConflit(client, patient_id, appointment_date, id);
         await client.query(`
             UPDATE appointments 
                 SET status = $1, updated_at = now() 
@@ -75,7 +80,7 @@ export async function updateStatus(id, status){
             [status, id]
         );
     });
-    await getById(id);
+    return await getById(id);
 }
 async function assertNoConflit(client, patientId, date, excludeId = null){
     const {rows} = await client.query(`

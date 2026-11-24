@@ -9,7 +9,7 @@ export const authenticate = (req, res, next) => {
     }
     try{
         const payload = jwt.verify(token, env.jwtSecret);
-        req.user = {id: payload.id, role: payload.role};
+        req.user = {id: payload.sub, role: payload.role};
         next();
     } catch (error) {
         return next(new AppError(401, 'Unauthorized', 'Invalid token'));
