@@ -12,3 +12,4 @@ psql -U postgres -c "CREATE DATABASE clinicflow;"
 
 -npm run migrate
 -npm run seed
+-npm run dev
