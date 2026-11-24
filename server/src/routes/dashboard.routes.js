@@ -4,3 +4,5 @@ import {stats} from '../controllers/dashboard.controller.js'
 
 const r = Router();
 r.get('/stats',authenticate, stats);
+
+export default r;

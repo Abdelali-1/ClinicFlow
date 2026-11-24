@@ -6,7 +6,7 @@ import { env } from './config/env.js';
 import authRoutes from './routes/auth.route.js';
 import patientRoute from './routes/patient.route.js';
 import appointmentRoute from './routes/appointment.route.js';
-import dashboardRoute from './routes/dashboard.routes.js';
+import dashbaordRoutes from './routes/dashboard.routes.js';
 import { notFound,errorHandler } from './middleware/error.js';
 
 const app = express();
@@ -25,7 +25,7 @@ app.get('/api/health',(req,res) => res.json({status : "ok"}));
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoute);
 app.use('/api/appointments', appointmentRoute);
-app.use('/api/dashboard', dashboardRoute);
+app.use('/api/dashboard', dashbaordRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

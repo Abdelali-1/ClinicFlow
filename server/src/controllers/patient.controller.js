@@ -1,4 +1,4 @@
-import { asyncHandler } from "../utils/asyncHandler";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import * as srv from "../services/patient.service.js"
 
 export const create = asyncHandler(async (req, res) => {
