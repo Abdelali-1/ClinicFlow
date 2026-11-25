@@ -25,3 +25,8 @@ PORT, DATABASE_URL, JWT_SECRET, JWT_EXPIRES_IN, CLIENT_URL
 # ClinicFlow
 ## ClinicFlow_client
 npm create vite@latest client -- --template react
+npm i 
+npm i axios react-router-dom
+npm install @mui/material @emotion/react @emotion/styled
+npm install @mui/icons-material
+npm install @mui/x-data-grid
