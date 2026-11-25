@@ -14,10 +14,11 @@ import {
   Stack,
   CircularProgress
 } from "@mui/material";
+
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import logo from "../assets/logo_flow.webp"
 
-export default function login(){
+export default function Login(){
     const {user, login} = useAuth();
     const navigate = useNavigate();
     
@@ -59,16 +60,18 @@ export default function login(){
             <Card sx={{ width:"100%", maxWidth:420, borderRadius: 3, boxShadow: 4}}>
                 <CardContent sx={{p: 4}}>
                     <Stack spacing={2.5} alignItems="center">
-                        <img
-                            src={logo}
-                            alt="logo"
-                            style={{
-                                width: 90,
-                                height: 90,
-                                objectFit: "contain",
-                            }}
-                        />
-                        <Typography variant="body2" color="text.secandary">
+                        <Box sx={{ display :"flex", flexDirection:"column" ,alignItems:"center",justifyContent:"center"}}>
+                        <LockOutlinedIcon
+                            color="primary"
+                            sx={{ fontSize: 45 }}
+                            />
+
+                        <Typography variant="h5" fontWeight="bold">
+                            ClinicFlow
+                        </Typography>
+                        </Box>
+
+                        <Typography variant="body2" color="text.secondary">
                             Connectez-vous à votre compte
                         </Typography>
                         {error && (
