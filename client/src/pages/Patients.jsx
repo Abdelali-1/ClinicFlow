@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useState} from "react";
-import {Link} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import api ,{errMsg} from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import PatientForm from "../components/PatientForm";
@@ -27,19 +27,21 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Navigate } from "react-router-dom";
 
-export default function patients(){
+export default function Patients(){
     const {user} = useAuth();
+    const navigate = useNavigate();
     const [data, setData] = useState({
         items:[], total :0, totalPages : 1
     });
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [editing, setEditing] = useState(null);
-    const [error, setError] = useState('')
-    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [error, setError] = useState('')    
     const [loading, setLoading] = useState(false);
-    const [detailsLoading, setDetailsLoading] = useState(false);
+
 
     const load = useCallback(async () => {
          setLoading(true);
@@ -69,19 +71,6 @@ export default function patients(){
         return () =>clearTimeout(t); 
     }, [load]);
 
-    const viewPatient = async (id) => {
-        setDetailsLoading(true);
-        setError('');
-        try{
-            const response = await api.get(`/patient/${id}`)
-            setDetailsLoading(response.data);
-        }
-        catch (err) {
-            setError(errMsg(err));
-        } finally {
-            setDetailsLoading(false);
-        }
-    }
     const handleSaved = async () => {
         setEditing(null);
         await load();
@@ -102,9 +91,7 @@ export default function patients(){
         <Box>
             <Stack 
                 direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                sx={{mb:3}}
+                sx={{mb:3 , justifyContent:"space-between", alignItems:"center"}}
             >
                 <Typography variant="h4" fontWeight="bold">
                     patients {data.total}
@@ -112,7 +99,7 @@ export default function patients(){
                 <Button 
                     variant="contained"
                     startIcon={<AddIcon/>}
-                    onClick={setEditing({})}
+                    onClick={() => setEditing({})}
                 >
                     Ajouter un patient
                 </Button>
@@ -125,12 +112,14 @@ export default function patients(){
                     setSearch(e.target.value)
                     setPage(1);
                 }}
-                InputProps={{
+                slotProps={{
+                    input: {
                     startAdornment: (
                         <InputAdornment position="start">
-                            <SearchIcon color="action" />
+                        <SearchIcon color="action" />
                         </InputAdornment>
                     )
+                    }
                 }}
                 sx={{mb: 3}}
             />
@@ -160,15 +149,7 @@ export default function patients(){
                                 {data.items.map((p) => (
                                     <TableRow key={p.id} hover>
 
-                                        <TableCell>
-                                            <Button
-                                                variant="text"
-                                                disabled={detailsLoading}
-                                                onClick={() => viewPatient(p.id)}
-                                                sx={{textTransform:"none"}}
-                                            >
-                                                p.fullName
-                                            </Button>
+                                        <TableCell>{p.fullName}
                                         </TableCell>
                                         <TableCell>{p.cin}</TableCell>
                                         <TableCell>{p.phone}</TableCell>
@@ -178,8 +159,17 @@ export default function patients(){
                                             <Stack
                                                 direction="row"
                                                 spacing={1}
-                                                justifyContent="flex-end"
+                                                sx={{justifyContent:"flex-end"}}
                                             >
+                                               
+                                                <IconButton
+                                                    color="success"
+                                                    onClick={() => navigate(`/patients/${p.id}`)}
+                                                    title="view"
+                                                >
+                                                    <VisibilityIcon/>
+                                                </IconButton>
+
                                                 <IconButton
                                                     color="primary"
                                                     onClick={() => setEditing(p)}
@@ -215,10 +205,8 @@ export default function patients(){
 
                 <Stack
                     direction="row"
-                    justifyContent="center"
-                    alignItems="center"
                     spacing={3}
-                    sx={{mt:3}}
+                    sx={{mt:3, justifyContent:"space-between", alignItems:"center"}}
                 >
                     <Button
                         variant="outlined"
@@ -248,10 +236,6 @@ export default function patients(){
                             onSaved={handleSaved}
                         />
                     )
-                }
-
-                {
-                    
                 }
         </Box>
     );

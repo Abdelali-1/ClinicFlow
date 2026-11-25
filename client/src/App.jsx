@@ -1,15 +1,21 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import PatientDetails from './pages/PatientDetails.jsx'
+import Patients from './pages/Patients.jsx'
+import Login from './pages/Login.jsx'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-    </>
+    <Routes>
+      <Route path="/login" element={<Login/>}/>
+      <Route element={<ProtectedRoute/>}>
+          <Route path="/" element={<Dashboard/>}/>
+          <Route path="/patients" element={<Patients/>}/>
+          <Route path="/patients/:id" element={<PatientDetails/>}/>
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 

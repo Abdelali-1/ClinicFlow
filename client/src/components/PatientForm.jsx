@@ -10,8 +10,11 @@ import {
   Button,
   Alert,
   Stack,
-  CircularProgress
+  CircularProgress,
+  IconButton 
 } from "@mui/material";
+
+import CloseIcon from "@mui/icons-material/Close";
 
 export default function PatientForm({patient, onClose, onSaved}){
     const  [form, setForm] = useState({
@@ -55,13 +58,26 @@ export default function PatientForm({patient, onClose, onSaved}){
     return(
         <Dialog
             open={true}
-            onClose={onClose}
+            onClose={(_, reason) => {
+                if (reason !== "backdropClick") {
+                onClose();
+                }
+            }}
             fullWidth
             maxWidth="sm">
                 <form onSubmit={submit}>
                     <DialogTitle>
-                        {patient?.id ? "Modifier le patient" : "Ajouter patient"}
+                       <Stack 
+                            direction="row"
+                            sx={{alignItems: "center", justifyContent:"space-between"}}
+                            >
+                                {patient?.id ? "Modifier le patient" : "Ajouter patient"}
+                                <IconButton onClick={onClose} aria-label="Fermer">
+                                    <CloseIcon />
+                                </IconButton>
+                       </Stack>
                     </DialogTitle>
+                    
                     <DialogContent>
                         <Stack spacing={2} sx={{mt:1}}>
                             {error && (
@@ -115,7 +131,7 @@ export default function PatientForm({patient, onClose, onSaved}){
 
                     <DialogActions sx={{p:3}}>
                         <Button
-                            onClick={onclose}
+                            onClick={onClose}
                             color="inherit"
                             disabled={loading}>
                             Annuler
