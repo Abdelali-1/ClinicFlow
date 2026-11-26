@@ -18,7 +18,7 @@ npm i swagger-ui-express
 
 ## test
 npm i -D jest supertest
-npm test
+npm run test
 ## Env variables (backend/.env)
 PORT, DATABASE_URL, JWT_SECRET, JWT_EXPIRES_IN, CLIENT_URL
 
