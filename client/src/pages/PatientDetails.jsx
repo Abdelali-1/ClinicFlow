@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import api, { errMsg } from "../api/client.js";
 
 import {
+  Snackbar,
   Box,
   Typography,
   Button,
@@ -36,23 +37,29 @@ export default function PatientDetails(){
     const [patient, setPatient] = useState(null);
     const [appts, setAppts] = useState([]);
 
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
-
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success"
+    });
+    const showSnackbar = (message, severity = "success") => {
+        setSnackbar({
+            open: true,
+            message,
+            severity
+        });
+    };
     useEffect(() => {
         let active = true;
 
         const loadDetails = async () => {
             setLoading(true);
-            setError("");
-
             try {
                 const [patientResponse, appointmentsResponse] =
                 await Promise.all([
                     api.get(`/patients/${id}`),
-                    api.get("/appointments", {
-                    params: { patientId: id }
-                    })
+                    api.get("/appointments", {params: { patientId: id }})
                 ]);
 
                 if (!active) return;
@@ -69,11 +76,11 @@ export default function PatientDetails(){
                 setAppts(appointments);
             } catch (err) {
                 if (active) {
-                setError(errMsg(err));
+                    showSnackbar(errMsg(err),"error");
                 }
             } finally {
                 if (active) {
-                setLoading(false);
+                    setLoading(false);
                 }
             }
             };
@@ -99,22 +106,6 @@ export default function PatientDetails(){
             </Box>
         );
     }
-    if(error){
-        return(
-            <Box>
-                <Alert severity="error" sx={{mb:2}}>
-                    {error}
-                </Alert>
-                <Button
-                    component={Link}
-                    to="/patients"
-                    startIcon={<ArrowBackIcon />}
-                >
-                    Retour aux patients
-                </Button>
-            </Box>
-        );
-    }
     
     if(!patient){
         return(
@@ -127,6 +118,18 @@ export default function PatientDetails(){
         if(!date) return "-";
         return new Date(date).toLocaleString('fr-FR');
     } 
+    const getStatusLabel = (status) => {
+        switch (status?.toLowerCase()) {
+            case "confirmed":
+                return "Confirmé";
+            case "pending":
+                return "En attente";
+            case "cancelled":
+                return "Annulé";
+            default:
+                return status;
+        }
+    };
     const getStatusColor = (status) =>{
         switch(status?.toLowerCase()){
             case "confirmed":
@@ -180,7 +183,7 @@ export default function PatientDetails(){
                 }}
                 >
                 <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
-                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+                    <Stack direction="row" spacing={1} sx={{ mb: 1.5, alignItems:"center" }}>
                     <PersonIcon color="primary" fontSize="small" />
 
                     <Typography variant="subtitle1" fontWeight="bold">
@@ -275,7 +278,7 @@ export default function PatientDetails(){
 
                                 <TableCell>
                                     <Chip
-                                        label={a.status}
+                                        label={getStatusLabel(a.status)}
                                         color={getStatusColor(a.status)}
                                         size="small"
                                     />
@@ -294,7 +297,7 @@ export default function PatientDetails(){
 
                         {!appts.length && (
                             <TableRow>
-                                <TableCell colSpan={4} align="center">
+                                <TableCell colSpan={4} sx={{textAlign:"center"}}>
                                     Aucun rendez-vous trouvé
                                 </TableCell>
                             </TableRow>
@@ -303,6 +306,28 @@ export default function PatientDetails(){
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() =>
+                    setSnackbar((prev) => ({ ...prev, open: false }))
+                }
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right"
+                }}
+            >
+                <Alert
+                    severity={snackbar.severity}
+                    variant="filled"
+                    onClose={() =>
+                        setSnackbar((prev) => ({ ...prev, open: false }))
+                    }
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
     </Box>
     );
 }

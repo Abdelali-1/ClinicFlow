@@ -10,7 +10,7 @@ const SELECT = `
 
 export async function getById(id){
     const {rows} = await query(`${SELECT} WHERE a.id = $1`, [id]);
-    if(!rows[0]) throw new AppError(404, 'Appointment not found');
+    if(!rows[0]) throw new AppError(404, 'Rendez-vous introuvable.');
     return rows[0];
 } 
 
@@ -29,7 +29,7 @@ export async function create(d, userId){
             );
         
         if (!rows[0]) {
-            throw new AppError(500, 'Appointment creation failed');
+            throw new AppError(500, 'Échec de la création du rendez-vous.');
         }
         return rows[0].id;
     });
@@ -37,7 +37,7 @@ export async function create(d, userId){
 }
 
 export async function list({date, status, patientId}) {
-    const cond = [];
+    const cond = ['a.deleted_at IS NULL'];
     const params = [];
     if(date){
         params.push(date);
@@ -45,19 +45,20 @@ export async function list({date, status, patientId}) {
             a.appointment_date >= $${params.length}::date 
             AND a.appointment_date < ($${params.length}::date + 1)`
         );
-        if(status) {
-            params.push(status);
-            cond.push(`a.status = $${params.length}`);
-        }
-        if(patientId) {
-            params.push(patientId);
-            cond.push(`a.patient_id = $${params.length}`);
-        }
-
-        const where = cond.length ? `WHERE ${cond.join(' AND ')}`: '';
-        const {rows} = await query(`${SELECT} ${where} ORDER BY a.appointment_date ASC LIMIT 500`, params);
-        return rows;
     }
+    if(status) {
+        params.push(status);
+        cond.push(`a.status = $${params.length}`);
+    }
+    if(patientId) {
+        params.push(patientId);
+        cond.push(`a.patient_id = $${params.length}`);
+    }
+
+    const where = cond.length ? `WHERE ${cond.join(' AND ')}`: '';
+    const {rows} = await query(`${SELECT} ${where} ORDER BY a.appointment_date ASC LIMIT 500`, params);
+
+    return rows;
 }
 
 export async function updateStatus(id, status){
@@ -94,7 +95,7 @@ async function assertNoConflit(client, patientId, date, excludeId = null){
         [patientId, date, excludeId]
     );
     if(rows.length){
-        throw new AppError(409, 'patient has already  confirmed patient within 30m of this time');
+        throw new AppError(409, 'Ce patient possède déjà un rendez-vous confirmé dans un intervalle de 30 minutes autour de cet horaire.');
     }
 }
 
@@ -103,5 +104,5 @@ async function lockPatient(client, patientId){
         SELECT id FROM patients 
             WHERE id = $1 FOR UPDATE`,
         [patientId]);
-    if(!rows[0]) throw new AppError(404,'patient not found');
+    if(!rows[0]) throw new AppError(404,'Patient introuvable.');
 }

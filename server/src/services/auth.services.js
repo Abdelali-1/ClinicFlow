@@ -15,12 +15,15 @@ export async function login(email, password){
     );
 
     const user = rows[0];
-    console.log('User found:', !!user);
-    console.log('Hash exists:', !!user?.password_hash);
+    
     const result = user && (await bcrypt.compare(password, user.password_hash));
-    if(!result) throw new AppError(401,'Invalid user or password');
+    if(!result) throw new AppError(401,'Identifiant ou mot de passe incorrect.');
 
-    const token = jwt.sign({sub: user.id, role: user.role}, env.jwtSecret, {expiresIn: env.jwtExpiration});
+    const token = jwt.sign(
+        {sub: user.id, role: user.role},
+        env.jwtSecret,
+          {expiresIn: env.jwtExpiration}
+    );
     return {token, user: publicUser(user)};
 }
 
@@ -31,6 +34,6 @@ export async function GetMe(id){
             WHERE id = $1 `,
         [id]);
 
-    if(!rows[0]) throw new AppError(401, 'User not exist');
+    if(!rows[0]) throw new AppError(401, "Cet utilisateur n'existe pas.");
     return publicUser(rows[0]);
 }

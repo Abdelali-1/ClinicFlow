@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import PatientDetails from './pages/PatientDetails.jsx'
 import Patients from './pages/Patients.jsx'
 import Login from './pages/Login.jsx'
+import Appointments from './pages/Appointments.jsx'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<Dashboard/>}/>
           <Route path="/patients" element={<Patients/>}/>
           <Route path="/patients/:id" element={<PatientDetails/>}/>
+          <Route path="/appointments" element={<Appointments/>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
