@@ -13,7 +13,6 @@ ClinicFlow contient 3 tables principales :
 - **1-1 :** Non nécessaire dans ce projet.
 - **N-N :** Non nécessaire dans ce projet.
 
-## Schéma de la base de données (ERD)
 
 ## Schéma de la base de données (ERD)
 
