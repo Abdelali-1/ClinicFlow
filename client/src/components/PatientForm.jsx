@@ -1,6 +1,5 @@
 import { useState } from "react";
 import api, {errMsg} from "../api/client.js";
-
 import {
   Dialog,
   DialogTitle,
@@ -11,7 +10,8 @@ import {
   Alert,
   Stack,
   CircularProgress,
-  IconButton 
+  IconButton,
+  Snackbar
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
@@ -24,8 +24,21 @@ export default function PatientForm({patient, onClose, onSaved}){
         birthDate: patient?.birthDate || '',
         address: patient?.address || '',
     });
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success"
+    });
+    const showSnackbar = (message, severity = "success") => {
+        setSnackbar({
+            open: true,
+            message,
+            severity
+        });
+    };
     const set = (k) => (e) =>{ 
         setForm((prev) => ({
                 ...prev,
@@ -34,8 +47,7 @@ export default function PatientForm({patient, onClose, onSaved}){
         }
 
     const submit = async (e)=> {
-        e.preventDefault();
-        setError('');
+        e.preventDefault()
         setLoading(true);
         const payload = {...form, address: form.address || ''};
         try{
@@ -45,10 +57,15 @@ export default function PatientForm({patient, onClose, onSaved}){
             else {
                 await api.post("/patients", payload);
             }
-            onSaved();
+
+            onSaved(
+                patient?.id
+                    ? "Patient modifié avec succès."
+                    : "Patient ajouté avec succès."
+            );
         }
         catch(err){
-            setError(errMsg(err));
+            showSnackbar(errMsg(err),"error")
         }
         finally{
             setLoading(false);
@@ -80,12 +97,6 @@ export default function PatientForm({patient, onClose, onSaved}){
                     
                     <DialogContent>
                         <Stack spacing={2} sx={{mt:1}}>
-                            {error && (
-                                <Alert security="error">
-                                    {error}
-                                </Alert>
-                            )}
-
                             <TextField 
                                 label="CIN"
                                 value={form.cin}
@@ -148,6 +159,28 @@ export default function PatientForm({patient, onClose, onSaved}){
                         </Button>
                     </DialogActions>
                 </form>
+                <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={4000}
+                    onClose={() =>
+                        setSnackbar((prev) => ({ ...prev, open: false }))
+                    }
+                    anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "right"
+                    }}
+                >
+                    <Alert
+                        severity={snackbar.severity}
+                        variant="filled"
+                        onClose={() =>
+                            setSnackbar((prev) => ({ ...prev, open: false }))
+                        }
+                        sx={{ width: "100%" }}
+                    >
+                        {snackbar.message}
+                    </Alert>
+                </Snackbar>
         </Dialog>
     )
 }

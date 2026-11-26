@@ -75,8 +75,12 @@ export default function Layout({ children }) {
       >
         <Toolbar sx={{ minHeight: 72 }}>
           {isMobile && (
-            <IconButton onClick={() => setMobileOpen(true)} edge="start" sx={{ mr: 2 }}>
-              <MenuIcon />
+            <IconButton
+                onClick={() => setMobileOpen((prev) => !prev)}
+                edge="start"
+                sx={{ mr: 2 }}
+            >
+                <MenuIcon />
             </IconButton>
           )}
 
@@ -87,21 +91,26 @@ export default function Layout({ children }) {
           <Box sx={{ flexGrow: 1 }} />
 
           {/* USER (bigger) */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mr: 2 }}>
-            <Avatar sx={{ bgcolor: "primary.main", width: 42, height: 42, fontWeight: 700 }}>
-              {user?.fullName?.[0]?.toUpperCase()}
-            </Avatar>
+         <Box>
+            <Typography
+                variant="subtitle2"
+                fontWeight={700}
+                sx={{
+                    maxWidth: { xs: 90, sm: 140 },
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap"
+                }}
+            >
+                {user?.fullName}
+            </Typography>
+
             {!isMobile && (
-              <Box>
-                <Typography variant="subtitle1" fontWeight={700}>
-                  {user?.fullName}
-                </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {ROLE_LABEL[user?.role] || user?.role}
+                    {ROLE_LABEL[user?.role] || user?.role}
                 </Typography>
-              </Box>
             )}
-          </Box>
+        </Box>
 
           <Button
             color="inherit"

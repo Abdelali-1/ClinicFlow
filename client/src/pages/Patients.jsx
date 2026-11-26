@@ -5,6 +5,9 @@ import { useAuth } from "../context/AuthContext.jsx";
 import PatientForm from "../components/PatientForm";
 
 import {
+  Chip, 
+  Tooltip,
+  Snackbar,
   Box,
   Typography,
   Button,
@@ -28,7 +31,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Navigate } from "react-router-dom";
 
 export default function Patients(){
     const {user} = useAuth();
@@ -39,12 +41,24 @@ export default function Patients(){
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [editing, setEditing] = useState(null);
-    const [error, setError] = useState('')    
     const [loading, setLoading] = useState(false);
-
-
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success"
+    });
+     /**
+     * snackbar 
+     */
+    const showSnackbar = (message, severity = "success") => {
+        setSnackbar({
+            open: true,
+            message,
+            severity
+        });
+    };
     const load = useCallback(async () => {
-         setLoading(true);
+        setLoading(true);
         try{
             const {data} = await api.get('/patients', {
                 params: { 
@@ -54,10 +68,9 @@ export default function Patients(){
                 }
             });
             setData(data);
-            setError('');
         }
         catch(err){
-            setError(errMsg(err));
+            showSnackbar(errMsg(err), "error");
         }
         finally {
             setLoading(false);
@@ -71,9 +84,10 @@ export default function Patients(){
         return () =>clearTimeout(t); 
     }, [load]);
 
-    const handleSaved = async () => {
+    const handleSaved = async (message) => {
         setEditing(null);
         await load();
+        showSnackbar(message,"success");
     };
 
     const remove = async (p) => {
@@ -81,9 +95,10 @@ export default function Patients(){
         try{
             await api.delete(`/patients/${p.id}`);
             load();
+            showSnackbar("Patient supprimé avec succès.", "success");
         }
         catch(err){
-            setError(errMsg(err));
+            showSnackbar(errMsg(err), "error");
         }
     }
 
@@ -123,12 +138,7 @@ export default function Patients(){
                 }}
                 sx={{mb: 3}}
             />
-            {error && (
-                <Alert severity="error" sx={{mb: 2}} onClose={() => setError('')}>
-                    {error}
-                </Alert>
-            )}
-
+            
             {loading ? (
                     <Box sx={{display:"flex", justifyContent:"center", p:5 }}>
                         <CircularProgress/>
@@ -142,6 +152,7 @@ export default function Patients(){
                                     <TableCell>CIN</TableCell>
                                     <TableCell>Téléphone</TableCell>
                                     <TableCell>Date de naissance</TableCell>
+                                    <TableCell>Rendez-vous</TableCell>
                                     <TableCell align="right">Actions</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -154,7 +165,19 @@ export default function Patients(){
                                         <TableCell>{p.cin}</TableCell>
                                         <TableCell>{p.phone}</TableCell>
                                         <TableCell>{p.birthDate}</TableCell>
-
+                                        <TableCell>
+                                            {p.appointmentsCount === 0 ? (
+                                                <Chip size="small" variant="outlined" label="Aucun" />
+                                            ) : (
+                                                <Tooltip title={`${p.confirmedCount} confirmé(s) sur ${p.appointmentsCount}`}>
+                                                <Chip
+                                                    size="small"
+                                                    label={`${p.appointmentsCount} RDV`}
+                                                    color={p.confirmedCount > 0 ? "success" : "warning"}
+                                                />
+                                                </Tooltip>
+                                            )}
+                                        </TableCell>
                                         <TableCell align="right">
                                             <Stack
                                                 direction="row"
@@ -237,6 +260,28 @@ export default function Patients(){
                         />
                     )
                 }
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={4000}
+                onClose={() =>
+                    setSnackbar((prev) => ({ ...prev, open: false }))
+                }
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right"
+                }}
+            >
+                <Alert
+                    severity={snackbar.severity}
+                    variant="filled"
+                    onClose={() =>
+                        setSnackbar((prev) => ({ ...prev, open: false }))
+                    }
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

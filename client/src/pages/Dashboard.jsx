@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  Alert, Avatar, Box, Card, CardContent, Chip, Paper, Skeleton,
+  Snackbar,Alert, Avatar, Box, Card, CardContent, Chip, Paper, Skeleton,
   Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
@@ -32,6 +32,19 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [today, setToday] = useState([]);
   const [error, setError] = useState("");
+  
+  const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "success"
+    });
+    const showSnackbar = (message, severity = "success") => {
+        setSnackbar({
+            open: true,
+            message,
+            severity
+        });
+    };
 
   useEffect(() => {
     const date = new Date().toLocaleDateString("en-CA"); 
@@ -43,7 +56,7 @@ export default function Dashboard() {
         setStats(s.data);
         setToday(a.data.items);
       })
-      .catch((e) => setError(errMsg(e)));
+      .catch((e) => showSnackbar(errMsg(e),"error"));
   }, []);
 
   const cards = [
@@ -61,9 +74,7 @@ export default function Dashboard() {
       <Typography color="text.secondary" sx={{ mb: 3 }}>
         Aperçu de l'activité de la clinique
       </Typography>
-
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
+      
       <Box
         sx={{
           display: "grid",
@@ -115,6 +126,29 @@ export default function Dashboard() {
           </TableBody>
         </Table>
       </Paper>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() =>
+            setSnackbar((prev) => ({ ...prev, open: false }))
+        }
+        anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right"
+        }}
+    >
+        <Alert
+            severity={snackbar.severity}
+            variant="filled"
+            onClose={() =>
+                setSnackbar((prev) => ({ ...prev, open: false }))
+            }
+            sx={{ width: "100%" }}
+        >
+            {snackbar.message}
+        </Alert>
+    </Snackbar>
     </>
   );
 }

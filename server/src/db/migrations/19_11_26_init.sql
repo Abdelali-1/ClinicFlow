@@ -34,7 +34,7 @@ CREATE TABLE appointments(
     notes TEXT,
     created_by uuid REFERENCES users(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 );
 
 CREATE TABLE audit_logs (
