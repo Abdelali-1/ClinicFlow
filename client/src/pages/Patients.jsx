@@ -91,7 +91,7 @@ export default function Patients(){
     };
 
     const remove = async (p) => {
-        if(!window.confirm(`Delete ${p.fullName}? their appointment will be  deleted too`)) retrun;
+        if(!window.confirm(`Supprimer ${p.fullName} ? Tous ses rendez-vous seront également supprimés.`)) return;
         try{
             await api.delete(`/patients/${p.id}`);
             load();
