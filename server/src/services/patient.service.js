@@ -4,6 +4,13 @@ import { AppError } from "../utils/AppErrors.js";
 const COLS = `id, full_name AS "fullName", cin, phone, birth_date AS "birthDate",
               address, created_at AS "createdAt"`;
 
+const LIST_COLS = `${COLS},
+  (SELECT COUNT(*)::int FROM appointments a
+     WHERE a.patient_id = patients.id AND a.deleted_at IS NULL) AS "appointmentsCount",
+  (SELECT COUNT(*)::int FROM appointments a
+     WHERE a.patient_id = patients.id AND a.deleted_at IS NULL
+       AND a.status = 'confirmed') AS "confirmedCount"`;
+
 export async function create(d){
     const {rows} = await query(`
         INSERT INTO patients (full_name, cin, phone, birth_date, address)
@@ -33,11 +40,11 @@ export async function list({search, page, limit}){
     }
     const offset = (page - 1) * limit;
     const [items, count] = await Promise.all([
-        query(`SELECT ${COLS} FROM patients ${where}
-        ORDER BY created_at DESC 
-        LIMIT $${params.length +1} 
-        OFFSET $${params.length +2}`,
-        [...params, limit, offset]),
+        query(
+            `SELECT ${LIST_COLS} FROM patients ${where}
+            ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+            [...params, limit, offset]
+        ),
         query(`SELECT COUNT(*)::int AS total FROM patients ${where}`,params)
     ]);
 

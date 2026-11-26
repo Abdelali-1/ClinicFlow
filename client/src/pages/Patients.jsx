@@ -5,6 +5,8 @@ import { useAuth } from "../context/AuthContext.jsx";
 import PatientForm from "../components/PatientForm";
 
 import {
+  Chip, 
+  Tooltip,
   Snackbar,
   Box,
   Typography,
@@ -29,7 +31,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Navigate } from "react-router-dom";
 
 export default function Patients(){
     const {user} = useAuth();
@@ -151,6 +152,7 @@ export default function Patients(){
                                     <TableCell>CIN</TableCell>
                                     <TableCell>Téléphone</TableCell>
                                     <TableCell>Date de naissance</TableCell>
+                                    <TableCell>Rendez-vous</TableCell>
                                     <TableCell align="right">Actions</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -163,7 +165,19 @@ export default function Patients(){
                                         <TableCell>{p.cin}</TableCell>
                                         <TableCell>{p.phone}</TableCell>
                                         <TableCell>{p.birthDate}</TableCell>
-
+                                        <TableCell>
+                                            {p.appointmentsCount === 0 ? (
+                                                <Chip size="small" variant="outlined" label="Aucun" />
+                                            ) : (
+                                                <Tooltip title={`${p.confirmedCount} confirmé(s) sur ${p.appointmentsCount}`}>
+                                                <Chip
+                                                    size="small"
+                                                    label={`${p.appointmentsCount} RDV`}
+                                                    color={p.confirmedCount > 0 ? "success" : "warning"}
+                                                />
+                                                </Tooltip>
+                                            )}
+                                        </TableCell>
                                         <TableCell align="right">
                                             <Stack
                                                 direction="row"
