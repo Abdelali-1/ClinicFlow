@@ -202,7 +202,7 @@ export default function Appointments() {
                 }}
             >
                 <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 2 }}>
-                    Create appointment
+                    Créer un rendez-vous
                 </Typography>
 
                 <Box
@@ -233,7 +233,7 @@ export default function Appointments() {
                     </TextField>
 
                     <TextField
-                        label="Appointment date"
+                        label="Date du rendez-vous"
                         type="datetime-local"
                         value={form.appointmentDate}
                         onChange={set("appointmentDate")}
@@ -246,7 +246,7 @@ export default function Appointments() {
                     />
 
                     <TextField
-                        label="Reason"
+                        label="Motif"
                         value={form.reason}
                         onChange={set("reason")}
                         required
@@ -255,7 +255,7 @@ export default function Appointments() {
                     />
 
                     <TextField
-                        label="Notes (optional)"
+                        label="Notes (optionnelles)"
                         value={form.notes}
                         onChange={set("notes")}
                         fullWidth
@@ -306,7 +306,7 @@ export default function Appointments() {
                     sx={{alignItems:"center"}}
                 >
                     <TextField
-                        label="Filter by date"
+                        label="Filtrer par date"
                         type="date"
                         value={filters.date}
                         sx={{
@@ -328,7 +328,7 @@ export default function Appointments() {
 
                     <TextField
                         select
-                        label="Filter by status"
+                        label="Filtrer par statut"
                         value={filters.status}
                         onChange={(e) =>
                             setFilters((prev) => ({
@@ -344,7 +344,7 @@ export default function Appointments() {
                             flex: { xs: "unset", sm: 5 }
                         }}
                     >
-                        <MenuItem value="">All statuses</MenuItem>
+                        <MenuItem value="">Tous les statuts</MenuItem>
 
                         {STATUS.map((s) => (
                             <MenuItem key={s.value} value={s.value}>
@@ -364,7 +364,7 @@ export default function Appointments() {
                         startIcon={<RestartAltIcon />}
                         onClick={() => setFilters({ date: "", status: "" })}
                     >
-                        Reset
+                        Réinitialiser
                     </Button>
                 </Stack>
             </Paper>

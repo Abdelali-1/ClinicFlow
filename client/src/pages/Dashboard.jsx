@@ -60,7 +60,7 @@ export default function Dashboard() {
   }, []);
 
   const cards = [
-    { label: "Total patients", value: stats?.totalPatients, icon: <PeopleIcon />, color: "primary" },
+    { label: "Total des patients", value: stats?.totalPatients, icon: <PeopleIcon />, color: "primary" },
     { label: "Rendez-vous du jour", value: stats?.todayAppointments, icon: <TodayIcon />, color: "info" },
     { label: "En attente", value: stats?.pending, icon: <HourglassTopIcon />, color: "warning" },
     { label: "Confirmés", value: stats?.confirmed, icon: <CheckCircleIcon />, color: "success" },
